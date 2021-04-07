@@ -65,6 +65,7 @@ app.post("/users/login", (req: { body: JSON }, res) => {
     const name: string = login["name"];
     const password: string = login["password"];
     let response: response = { auth: false };
+    console.info(login)
 
     if (password.length === 56 && name !== "")
         userDB.query(
@@ -89,7 +90,7 @@ app.post("/users/login", (req: { body: JSON }, res) => {
                             "' WHERE name = '" +
                             name +
                             "';",
-                        (err) => {
+                        (err: any) => {
                             if (err) throw err;
                         }
                     );

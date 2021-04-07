@@ -48,6 +48,7 @@ app.post("/users/login", (req, res) => {
     const name = login["name"];
     const password = login["password"];
     let response = { auth: false };
+    console.info(login);
     if (password.length === 56 && name !== "")
         userDB.query("SELECT name, pass from users WHERE name in ('" + name + "')", (err, results) => {
             if (err)
