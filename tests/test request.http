@@ -1,0 +1,45 @@
+POST http://localhost:3000/users/login
+Content-Type: application/json
+
+{
+  "name": "admin",
+  "password": "d46ebefb7a8246ce59c9a6e6d3dc1a62074bb3405cc54565f05cebbb"
+}
+
+###
+POST http://localhost:3000/users/login
+Content-Type: application/json
+
+{
+  "name": "newUser",
+  "password": "d46ebefb7a8246ce59c9a6e6d3dc1a62074bb3405cc54565f05cebbb"
+}
+###
+POST http://localhost:3000/users/register
+Content-Type: application/json
+
+{
+  "name": "admin",
+  "password": "d46ebefb7a8246ce59c9a6e6d3dc1a62074bb3405cc54565f05cebbb"
+}
+###
+POST http://localhost:3000/users/register
+Content-Type: application/json
+
+{
+  "name": "newUser",
+  "password": "d46ebefb7a8246ce59c9a6e6d3dc1a62074bb3405cc54565f05cebbb"
+}
+###
+POST http://localhost:3000/samples/list
+Content-Type: application/json
+
+{
+  "token": "3459035945192e84b2949d17ebfc6b2fd9f71c7b02a0d4ccb2491fa"
+}
+###
+
+
+GET http://localhost:3000/
+
+
