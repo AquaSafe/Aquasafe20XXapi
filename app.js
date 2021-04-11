@@ -37,6 +37,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
+app.get("/tea", (ignore, res) => {
+    res.status(418).send("I'm a little Teapot, Short and stout");
+});
 app.get("/*", (req, res) => {
     res.render("index");
 });
@@ -128,13 +131,36 @@ app.post("/users/register", (req, res) => {
         res.status(400).send(JSON.stringify(response));
     }
 });
+// Token validation
+app.post("/users/validate", (req, res) => {
+    let token = req.body["token"];
+    let response = { auth: false };
+    if (token.length === 56)
+        userDB.query("SELECT name, `group` from users WHERE token in ('" + token + "');", (err, results) => {
+            if (err)
+                throw err;
+            results = JSON.parse(JSON.stringify(results));
+            if (results.length === 1) {
+                response.auth = true;
+                response.msg = "200: OK";
+            }
+            else {
+                response.msg = "403: Invalid";
+            }
+            res.status(parseInt(response.msg.substr(0, 2), 10)).send(JSON.stringify(response));
+        });
+    else {
+        response.msg = "400: Bad request";
+        res.status(parseInt(response.msg.substr(0, 2), 10)).send(JSON.stringify(response));
+    }
+});
 // SampleData endpoints
 app.post("/samples/list", (req, res) => {
     let request = req.body;
     let response = { auth: false };
     const authToken = request["token"];
     if (authToken.length === 56)
-        userDB.query("SELECT users, group FROM users WHERE token = '" + authToken + "';", (err, results) => {
+        userDB.query("SELECT name, `group` FROM users WHERE token = '" + authToken + "';", (err, results) => {
             if (err)
                 throw err;
             results = JSON.parse(JSON.stringify(results));
@@ -143,14 +169,53 @@ app.post("/samples/list", (req, res) => {
                 res.status(401).send(JSON.stringify(response));
             }
             else
-                sampleDB.query();
+                sampleDB.query("SELECT t.*" +
+                    "FROM samples.samples t WHERE owner = '" + results[0]["name"] + "' " +
+                    "ORDER BY id DESC", (err, results) => {
+                    if (err)
+                        throw err;
+                    results = JSON.parse(JSON.stringify(results));
+                    response.results = results;
+                    response.auth = true;
+                });
         });
     else {
         response.msg = "400";
         res.status(400).send(JSON.stringify(response));
     }
 });
-// Actually hosting the app so dont fucking touch it alex
+app.post("/samples/new", (req, res) => {
+    let token = req.body["token"];
+    let response = { auth: false };
+    if (token.length === 56)
+        userDB.query("SELECT name, `group` from users WHERE token in ('" + token + "');", (err, results) => {
+            if (err)
+                throw err;
+            results = JSON.parse(JSON.stringify(results));
+            console.log(results);
+            if (results.length === 1) {
+                sampleDB.query("INSERT INTO samples (owner, `group`, name, ph, hardness, color, location) VALUES " +
+                    "('" + results[0]["name"] + "', '" + results[0]["group"] + "', '" + req.body["sample"]["name"] + "', " +
+                    req.body["sample"]["pH"] + ", " + req.body["sample"]["hardness"] + ", " + req.body["sample"]["color"] +
+                    ", " + req.body["sample"]["location"] + ")", (err) => {
+                    if (err)
+                        throw err;
+                    response.auth = true;
+                    response.msg = "200: Submitted";
+                    res.status(parseInt(response.msg.substr(0, 3), 10)).send(JSON.stringify(response));
+                });
+            }
+            else {
+                response.msg = "403: Invalid";
+                res.status(parseInt(response.msg.substr(0, 3), 10)).send(JSON.stringify(response));
+            }
+        });
+    else {
+        response.msg = "400: Bad request";
+        res.status(parseInt(response.msg.substr(0, 3), 10)).send(JSON.stringify(response));
+    }
+});
+// Actually hosting the app
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));

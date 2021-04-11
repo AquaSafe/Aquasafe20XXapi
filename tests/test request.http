@@ -40,6 +40,37 @@ Content-Type: application/json
 ###
 
 
-GET http://localhost:3000/
+POST http://localhost:3000/users/validate
+Content-Type: application/json
 
+{
+  "token": "3f282e178acec9d29b23c43b499ccb2573321121106c48e01b1b1cf1"
+}
+
+###
+
+
+POST http://localhost:3000/samples/new
+Content-Type: application/json
+
+{
+  "token": "3f282e178acec9d29b23c43b499ccb2573321121106c48e01b1b1cf1",
+  "sample": {
+    "name": "Test",
+    "pH": 7.0,
+    "hardness": 100,
+    "color": 0,
+    "location": 0
+
+  }
+}
+
+###
+
+POST http://localhost:3000/samples/list
+Content-Type: application/json
+
+{
+  "token": "3f282e178acec9d29b23c43b499ccb2573321121106c48e01b1b1cf1"
+}
 
