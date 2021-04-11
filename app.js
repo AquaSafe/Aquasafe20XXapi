@@ -177,6 +177,8 @@ app.post("/samples/list", (req, res) => {
                     results = JSON.parse(JSON.stringify(results));
                     response.results = results;
                     response.auth = true;
+                    response.msg = "200: OK";
+                    res.status(parseInt(response.msg.substr(0, 3), 10)).send(JSON.stringify(response));
                 });
         });
     else {

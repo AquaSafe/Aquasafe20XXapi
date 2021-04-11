@@ -2,7 +2,9 @@ export interface Response {
     auth: boolean,
     msg?: string,
     token?: string,
-    results?: Array<object>
+    results?: Array<object>,
+    name ?: string
+
 }
 
 export interface Sample {
