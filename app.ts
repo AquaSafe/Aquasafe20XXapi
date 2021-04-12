@@ -180,13 +180,13 @@ app.post("/users/validate", (req: { body: JSON }, res) => {
                 } else {
                     response.msg = "403: Invalid";
                 }
-                res.status(parseInt(response.msg.substr(0, 2), 10)).send(JSON.stringify(response));
+                res.status(parseInt(response.msg.substr(0, 3), 10)).send(JSON.stringify(response));
             });
 
 
     else {
         response.msg = "400: Bad request";
-        res.status(parseInt(response.msg.substr(0, 2), 10)).send(JSON.stringify(response));
+        res.status(parseInt(response.msg.substr(0, 3), 10)).send(JSON.stringify(response));
     }
 });
 

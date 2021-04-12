@@ -142,16 +142,17 @@ app.post("/users/validate", (req, res) => {
             results = JSON.parse(JSON.stringify(results));
             if (results.length === 1) {
                 response.auth = true;
+                response.name = results[0]["name"];
                 response.msg = "200: OK";
             }
             else {
                 response.msg = "403: Invalid";
             }
-            res.status(parseInt(response.msg.substr(0, 2), 10)).send(JSON.stringify(response));
+            res.status(parseInt(response.msg.substr(0, 3), 10)).send(JSON.stringify(response));
         });
     else {
         response.msg = "400: Bad request";
-        res.status(parseInt(response.msg.substr(0, 2), 10)).send(JSON.stringify(response));
+        res.status(parseInt(response.msg.substr(0, 3), 10)).send(JSON.stringify(response));
     }
 });
 // SampleData endpoints
