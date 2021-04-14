@@ -3,7 +3,6 @@ import { Response, Sample } from "./lib/interfaces";
 const createError = require("http-errors"),
     express = require("express"),
     path = require("path"),
-    cookieParser = require("cookie-parser"),
     logger = require("morgan"),
     cors = require("cors"),
     mysql = require("mysql2"),
@@ -49,8 +48,6 @@ app.set("view engine", "pug");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 
 app.get("/tea", (ignore, res) => {
@@ -175,7 +172,7 @@ app.post("/users/validate", (req: { body: JSON }, res) => {
                 results = JSON.parse(JSON.stringify(results));
                 if (results.length === 1) {
                     response.auth = true;
-                    response.name = results[0]["name"]
+                    response.name = results[0]["name"];
                     response.msg = "200: OK";
                 } else {
                     response.msg = "403: Invalid";
@@ -215,7 +212,7 @@ app.post("/samples/list", (req, res) => {
 
                         response.results = results;
                         response.auth = true;
-                        response.msg = "200: OK"
+                        response.msg = "200: OK";
                         res.status(parseInt(response.msg.substr(0, 3), 10)).send(JSON.stringify(response));
                     });
             },
@@ -228,6 +225,7 @@ app.post("/samples/list", (req, res) => {
 
 app.post("/samples/new", (req: { body: { token: string, sample: Sample } }, res) => {
     let token: string = req.body["token"];
+    let sample: Sample = req.body["sample"];
     let response: Response = { auth: false };
     if (token.length === 56)
         userDB.query("SELECT name, `group` from users WHERE token in ('" + token + "');",
@@ -238,10 +236,9 @@ app.post("/samples/new", (req: { body: { token: string, sample: Sample } }, res)
                 console.log(results);
 
                 if (results.length === 1) {
-                    sampleDB.query("INSERT INTO samples (owner, `group`, name, ph, hardness, color, location) VALUES " +
-                        "('" + results[0]["name"] + "', '" + results[0]["group"] + "', '" + req.body["sample"]["name"] + "', " +
-                        req.body["sample"]["pH"] + ", " + req.body["sample"]["hardness"] + ", " + req.body["sample"]["color"] +
-                        ", " + req.body["sample"]["location"] + ")", (err) => {
+                    sampleDB.query("INSERT INTO samples.samples (owner, `group`, name, ph, hardness, color, location)" +
+                        "VALUES ('" + results[0]["name"] + "', '" + results[0]["group"] + "', '" + sample.name + "', " +
+                        sample.pH + ", " + sample.hardness + ", " + sample.color + ", " + sample.location + ");", (err) => {
                         if (err) throw err;
 
                         response.auth = true;

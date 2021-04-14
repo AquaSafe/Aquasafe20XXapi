@@ -1,5 +1,5 @@
 "use strict";
-const createError = require("http-errors"), express = require("express"), path = require("path"), cookieParser = require("cookie-parser"), logger = require("morgan"), cors = require("cors"), mysql = require("mysql2"), crypto = require("crypto"), debug = require("debug")("aquasafe20xxapi:server"), http = require("http"), config = require("./config.json");
+const createError = require("http-errors"), express = require("express"), path = require("path"), logger = require("morgan"), cors = require("cors"), mysql = require("mysql2"), crypto = require("crypto"), debug = require("debug")("aquasafe20xxapi:server"), http = require("http"), config = require("./config.json");
 // Database connections
 let userDB = mysql.createPool({
     host: config.database.hostname,
@@ -34,8 +34,6 @@ app.set("view engine", "pug");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 app.get("/tea", (ignore, res) => {
     res.status(418).send("I'm a little Teapot, Short and stout");
@@ -189,6 +187,7 @@ app.post("/samples/list", (req, res) => {
 });
 app.post("/samples/new", (req, res) => {
     let token = req.body["token"];
+    let sample = req.body["sample"];
     let response = { auth: false };
     if (token.length === 56)
         userDB.query("SELECT name, `group` from users WHERE token in ('" + token + "');", (err, results) => {
@@ -197,10 +196,9 @@ app.post("/samples/new", (req, res) => {
             results = JSON.parse(JSON.stringify(results));
             console.log(results);
             if (results.length === 1) {
-                sampleDB.query("INSERT INTO samples (owner, `group`, name, ph, hardness, color, location) VALUES " +
-                    "('" + results[0]["name"] + "', '" + results[0]["group"] + "', '" + req.body["sample"]["name"] + "', " +
-                    req.body["sample"]["pH"] + ", " + req.body["sample"]["hardness"] + ", " + req.body["sample"]["color"] +
-                    ", " + req.body["sample"]["location"] + ")", (err) => {
+                sampleDB.query("INSERT INTO samples.samples (owner, `group`, name, ph, hardness, color, location)" +
+                    "VALUES ('" + results[0]["name"] + "', '" + results[0]["group"] + "', '" + sample.name + "', " +
+                    sample.pH + ", " + sample.hardness + ", " + sample.color + ", " + sample.location + ");", (err) => {
                     if (err)
                         throw err;
                     response.auth = true;
